@@ -35,6 +35,7 @@ Important Links
 
 :source: https://github.com/mortbauer/asyncapi-sphinx-ext
 :documentation: https://asyncapi-sphinx-ext.readthedocs.org/en/latest/
+:pypi: https://pypi.org/project/asyncapi-sphinx-ext/
 
 .. _asyncapi: https://www.asyncapi.com/docs/specifications/2.0.0/
 .. _usage_example: 
