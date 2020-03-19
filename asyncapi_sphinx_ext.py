@@ -112,7 +112,7 @@ class AsyncApiChannelDirective(BaseAdmonition,SphinxDirective):
             text = '\n'.join(self.content).strip()
             res = yaml.load(text)
         else:
-            raise Exception('Needs optional dependencies ruamel.yaml'
+            raise Exception('Needs optional dependencies ruamel.yaml')
         # parse asyncapi spec
         channel['asyncapi'] = res 
         channel['docname'] = self.env.docname
@@ -227,11 +227,7 @@ class AsyncApiChannelProcessor:
         document = new_document('')
 
         for node in doctree.traverse(asyncapi_overview):
-            try:
-                table = self.create_full_table(node,channels,docname)
-            except Exception:
-                logger.exception('TTT')
-                table = nodes.table()
+            table = self.create_full_table(node,channels,docname)
             node.replace_self(table)
 
     def create_full_table(self,node,channels,docname):
@@ -320,7 +316,7 @@ class AsyncApiBuilder(Builder):
             with open(path, 'w') as dumpfile:
                 yaml.dump(self.data,dumpfile)
         else:
-            raise Exception('Needs optional dependencies ruamel.yaml'
+            raise Exception('Needs optional dependencies ruamel.yaml')
 
 def setup(app):
     data = []
