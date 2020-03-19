@@ -1,6 +1,5 @@
 
 import os
-from ruamel.yaml import YAML
 from collections import defaultdict
 
 from typing import Any, Dict, IO, List, Pattern, Set, Tuple, Iterable
@@ -24,6 +23,12 @@ from docutils.parsers.rst import Directive, directives
 from docutils.parsers.rst.directives.admonitions import BaseAdmonition
 
 logger = logging.getLogger(__name__)
+
+try:
+    from ruamel.yaml import YAML
+    yaml = YAML(typ='safe')
+except:
+    yaml = None
 
 
 def get_fields(x,parent=''):
@@ -94,7 +99,6 @@ class AsyncApiChannelDirective(BaseAdmonition,SphinxDirective):
         'name': directives.unchanged,
         'format': directives.unchanged,
     }
-    yaml = YAML(typ='safe')
 
     def run(self):
         asyncapi_format = self.options.get('format', 'rst')
@@ -103,10 +107,12 @@ class AsyncApiChannelDirective(BaseAdmonition,SphinxDirective):
         if as_admonition:
             (channel,) = super().run()  # type: Tuple[Node]
             res = get_fields(channel.children[0])
-        else:
+        elif yaml is not None:
             channel = self.node_class('')
             text = '\n'.join(self.content).strip()
-            res = self.yaml.load(text)
+            res = yaml.load(text)
+        else:
+            raise Exception('Needs optional dependencies ruamel.yaml'
         # parse asyncapi spec
         channel['asyncapi'] = res 
         channel['docname'] = self.env.docname
@@ -309,10 +315,12 @@ class AsyncApiBuilder(Builder):
         self.data['channels'] = channels
        
     def finish(self) -> None:
-        path = os.path.join(self.outdir, 'asyncapi.yaml')
-        yaml = YAML()
-        with open(path, 'w') as dumpfile:
-            yaml.dump(self.data,dumpfile)
+        if yaml is not None:
+            path = os.path.join(self.outdir, 'asyncapi.yaml')
+            with open(path, 'w') as dumpfile:
+                yaml.dump(self.data,dumpfile)
+        else:
+            raise Exception('Needs optional dependencies ruamel.yaml'
 
 def setup(app):
     data = []
