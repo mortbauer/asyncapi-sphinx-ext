@@ -14,7 +14,7 @@ setup(
     description='Sphinx extension for Pub/Sub Documentation',
     py_modules=['asyncapi_sphinx_ext'],  
     long_description=codecs.open("README.rst", "r", "utf-8").read(),
-    install_requires=['sphinx'],
+    install_requires=['sphinx>=2.4'],
     extras_require = {
         'yaml':  ["ruamel.yaml"]
     },
