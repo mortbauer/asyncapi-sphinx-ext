@@ -3,8 +3,13 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
-install: 
+before_install: 
+  - pip install --upgrade pip
   - pip install --upgrade -r requirements.txt
+  - pip install --upgrade codecov
+install: 
   - pip install .
 script: 
-  - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d .)
+  - py.test
+after_success:
+  - codecov # submit coverage
