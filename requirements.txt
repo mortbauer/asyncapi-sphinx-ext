@@ -3,4 +3,3 @@ sphinx-rtd-theme
 ruamel.yaml
 pytest
 tox
-tox-travis
