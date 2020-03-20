@@ -10,8 +10,6 @@ before_install:
 install: 
   - pip install .
 script: 
-  - ls tests
-  - cat tests/test_example.py
   - py.test
 after_success:
   - codecov # submit coverage

@@ -1,11 +1,3 @@
-.idea/
-.pybuild
-debian/debhelper-build-stamp
-debian/*.debhelper
-debian/senslyze/
-debian/*.substvars
-debian/files
-
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
 # Byte-compiled / optimized / DLL files
@@ -98,13 +90,3 @@ ENV/
 
 # Rope project settings
 .ropeprojectlegacy
-
-legacy
-test_*
-senslyze-sk-fake-dev.yaml
-senslyze-sk-real-dev.yaml
-senslyze-sk-real-measurekit.yaml
-senslyze-sk-dev.yaml
-*.whl
-senslyze-sk-prod.yaml
-senslyze-measurekit.yaml
