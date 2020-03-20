@@ -4,7 +4,7 @@ AsyncAPI Sphinx Extension
 #########################
 
 .. image:: https://img.shields.io/pypi/pyversions/asyncapi-sphinx-ext
-   :target:
+   :target: https://img.shields.io/pypi/pyversions/asyncapi-sphinx-ext
    :alt: PyPI - Python Version
 
 .. image:: https://img.shields.io/pypi/v/asyncapi-sphinx-ext.svg
@@ -26,7 +26,7 @@ AsyncAPI Sphinx Extension
    :alt: Wheel Status
 
 .. image:: https://img.shields.io/readthedocs/asyncapi-sphinx-ext   
-   :target:
+   :target: https://img.shields.io/readthedocs/asyncapi-sphinx-ext   
    :alt: Read the Docs
 
 This extension adds some directives to integrate documentation for your pub-sub
