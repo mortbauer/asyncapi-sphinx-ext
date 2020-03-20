@@ -11,8 +11,9 @@ AsyncAPI Sphinx Extension
    :target: https://pypi.org/project/asyncapi-sphinx-ext/
    :alt: Package on PyPI
 
-.. image:: https://travis-ci.org/mortbauer/asyncapi-sphinx-ext.svg?branch=master
+.. image:: https://img.shields.io/travis/mortbauer/asyncapi-sphinx-ext   
    :target: https://travis-ci.org/mortbauer/asyncapi-sphinx-ext
+   :alt: Travis (.org)
 
 .. image:: https://coveralls.io/repos/asyncapi-sphinx-ext/sphinx-testing/badge.png?branch=master
    :target: https://coveralls.io/r/asyncapi-sphinx-ext/sphinx-testing?branch=master
