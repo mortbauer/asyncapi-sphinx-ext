@@ -3,6 +3,27 @@
 AsyncAPI Sphinx Extension
 #########################
 
+.. image:: https://img.shields.io/pypi/pyversions/asyncapi-sphinx-ext
+   :alt: PyPI - Python Version
+
+.. image:: https://img.shields.io/pypi/v/asyncapi-sphinx-ext.svg
+   :target: https://pypi.org/project/asyncapi-sphinx-ext/
+   :alt: Package on PyPI
+
+.. image:: https://travis-ci.org/mortbauer/asyncapi-sphinx-ext.svg?branch=master
+   :target: https://travis-ci.org/mortbauer/asyncapi-sphinx-ext
+
+.. image:: https://coveralls.io/repos/sphinx-doc/sphinx-testing/badge.png?branch=master
+   :target: https://coveralls.io/r/sphinx-doc/sphinx-testing?branch=master
+
+.. image:: https://img.shields.io/pypi/dm/asyncapi-sphinx-ext.svg
+   :target: https://pypi.python.org/pypi/asyncapi-sphinx-ext
+   :alt: Number of PyPI downloads
+
+.. image:: https://img.shields.io/pypi/wheel/asyncapi-sphinx-ext.svg
+   :target: https://pypi.python.org/pypi/asyncapi-sphinx-ext
+   :alt: Wheel Status
+
 This extension adds some directives to integrate documentation for your pub-sub
 application using asyncapi_ specification.
 
