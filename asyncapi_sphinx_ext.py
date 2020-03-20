@@ -59,6 +59,10 @@ def get_fields(x,parent=''):
     return fields
 
 def to_fields(x):
+    for v in x.values():
+        if isinstance(v,dict):
+            pass
+
     if len(x) == 1:
         node = nodes.definition_list()
         df = nodes.definition_list_item()
@@ -179,7 +183,7 @@ class AsynApiDomain(Domain):
                     document: nodes.document) -> None:
         channels = self.channels.setdefault(docname, [])
         for channel in document.traverse(asyncapi_node):
-            env.app.emit('asyncapi_channel-defined', channel)
+            env.app.emit('asyncapi-channels-defined', channel)
             channels.append(channel)
 
 class AsyncApiDirective(SphinxDirective):
@@ -321,6 +325,7 @@ class AsyncApiBuilder(Builder):
 def setup(app):
     data = []
     app.setup_extension('sphinx.ext.autodoc')
+    app.add_event('asyncapi-channels-defined')
     app.add_config_value('asyncapi_data', {}, False)
     app.add_node(asyncapi_node,html=(visit_asyncapi_node,depart_asyncapi_node))
     app.add_node(asyncapi_overview)

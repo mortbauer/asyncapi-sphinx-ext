@@ -1,3 +1,6 @@
 sphinx>=2.4
 sphinx-rtd-theme
 ruamel.yaml
+pytest
+tox
+tox-travis
