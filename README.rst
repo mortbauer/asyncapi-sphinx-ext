@@ -13,8 +13,8 @@ AsyncAPI Sphinx Extension
 .. image:: https://travis-ci.org/mortbauer/asyncapi-sphinx-ext.svg?branch=master
    :target: https://travis-ci.org/mortbauer/asyncapi-sphinx-ext
 
-.. image:: https://coveralls.io/repos/sphinx-doc/sphinx-testing/badge.png?branch=master
-   :target: https://coveralls.io/r/sphinx-doc/sphinx-testing?branch=master
+.. image:: https://coveralls.io/repos/asyncapi-sphinx-ext/sphinx-testing/badge.png?branch=master
+   :target: https://coveralls.io/r/asyncapi-sphinx-ext/sphinx-testing?branch=master
 
 .. image:: https://img.shields.io/pypi/dm/asyncapi-sphinx-ext.svg
    :target: https://pypi.python.org/pypi/asyncapi-sphinx-ext
