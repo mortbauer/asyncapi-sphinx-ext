@@ -24,6 +24,9 @@ AsyncAPI Sphinx Extension
    :target: https://pypi.python.org/pypi/asyncapi-sphinx-ext
    :alt: Wheel Status
 
+.. image:: https://img.shields.io/readthedocs/asyncapi-sphinx-ext   
+   :alt: Read the Docs
+
 This extension adds some directives to integrate documentation for your pub-sub
 application using asyncapi_ specification.
 
