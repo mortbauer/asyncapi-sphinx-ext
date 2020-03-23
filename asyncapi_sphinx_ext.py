@@ -50,10 +50,9 @@ def get_fields(x,parent=''):
                     all_res = {}
                     for ch in child.children[1].children:
                         res = get_fields(ch,parent=parent+key)
-                        if len(res) != 1:
-                            logger.warning('Failed to get fields from %s',parent+key)
-                        else:
-                            skey = next(iter(res))
+                        for skey in res:
+                            if skey in all_res:
+                                logger.warning('Overwriting key %s in %s.%s',skey,parent,key)
                             all_res[skey] = res[skey]
                     fields[key] = all_res
     return fields
@@ -130,27 +129,26 @@ class AsyncApiChannelDirective(BaseAdmonition,SphinxDirective):
     }
 
     def run(self):
+        asyncapi_format = self.options.get('format', 'rst')
         filepath = self.options.get('from_file')
         if filepath is not None:
-            self.set_source_info(self)
-            cur_dir = os.path.dirname(self.source)
-            filepath = os.path.join(cur_dir,filepath)
-            with open(filepath,'r') as infile:
-                content = infile.read()
+            if asyncapi_format != 'yaml':
+                logger.warning('Selected from_file and rst which is not supported')
+            else:
+                self.set_source_info(self)
+                cur_dir = os.path.dirname(self.source)
+                filepath = os.path.join(cur_dir,filepath)
+                with open(filepath,'r') as infile:
+                    content = infile.read()
         else:
             content = '\n'.join(self.content).strip()
-        asyncapi_format = self.options.get('format', 'rst')
         # use all the text
         as_admonition = asyncapi_format == 'rst'
-        # import IPython
-        # IPython.embed()
         if as_admonition:
-            (channel,) = super().run()  # type: Tuple[Node]
+            (channel,) = super().run()  
             res = get_fields(channel.children[0])
         elif yaml is not None:
-            # channel = self.node_class('')
             res = yaml.load(content)
-            # channel.append(to_fields(res))
         else:
             raise Exception('Needs optional dependencies ruamel.yaml')
         channels = []
@@ -159,21 +157,13 @@ class AsyncApiChannelDirective(BaseAdmonition,SphinxDirective):
                 channel = self.node_class('')
                 channel['asyncapi'] = dat = {topic:{op:op_spec}} 
                 channel['docname'] = self.env.docname
-                # self.add_name(channel)
+                self.add_name(channel)
                 self.set_source_info(channel)
                 self.state.document.note_explicit_target(channel)
                 channel.append(to_fields(dat))
                 channels.append(channel)
         return channels
 
-    def make_property_spec(self,property_spec):
-        fl = nodes.field_list()
-        for key,value in property_spec.items():
-            field = nodes.field()
-            field.append(nodes.field_name(key,nodes.Text(key)))
-            field.append(nodes.field_body(value,nodes.Text(value)))
-            fl.append(field)
-        return fl
 
 class AsynApiDomain(Domain):
     name = 'asyncapi'
@@ -194,7 +184,6 @@ class AsynApiDomain(Domain):
                     document: nodes.document) -> None:
         channels = self.channels.setdefault(docname, [])
         for channel in document.traverse(asyncapi_node):
-            # print('3333333333333333',channel['asyncapi'],channel.astext())
             env.app.emit('asyncapi-channels-defined', channel)
             channels.append(channel)
 
@@ -253,7 +242,7 @@ class AsyncApiChannelProcessor:
             for topic,topic_spec in channel['asyncapi'].items():
                 for operation,op_spec in topic_spec.items():
                     if operation == wanted_operation:
-                        if 'of' in channel.source:
+                        if ' of ' in channel.source:
                             link_text = channel.source.split(' of ')[1]
                         else:
                             link_text = channel['ids'][0][2:]

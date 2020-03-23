@@ -1,0 +1,10 @@
+crazy_horse/<id>/msg:
+  publish:
+    summary: Current crazy horse message of the day
+    message:
+      contentType: application/json
+      payload:
+        properties:
+          at: 
+            type: number
+            format: unix epoch in seconds

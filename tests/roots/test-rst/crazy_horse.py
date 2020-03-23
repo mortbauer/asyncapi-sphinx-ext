@@ -13,6 +13,7 @@ def do_nothing(msg):
        crazy_horse/<id>/state
          publish
            :summary: Current crazy horse status
+           :description: This is my cool status
           
            message
              :contentType: application/json
