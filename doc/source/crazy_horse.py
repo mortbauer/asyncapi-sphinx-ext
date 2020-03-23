@@ -25,6 +25,23 @@ def do_nothing(msg):
 
                  temperature
                    :type: number
+ 
+
+       crazy_horse/<id>/test
+         publish
+           :summary: Current crazy horse status
+          
+           message
+             :contentType: application/json
+
+             payload
+               properties
+                 at
+                   :type: number
+                   :format: unix epoch in seconds
+
+                 temperature
+                   :type: number
 
     """
     pass

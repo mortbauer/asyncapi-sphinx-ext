@@ -7,6 +7,7 @@ import logging
 
 from sphinx import addnodes
 from sphinx import roles
+from sphinx.errors import NoUri
 from sphinx.locale import _, __
 from sphinx.domains import Domain
 from sphinx.environment import BuildEnvironment
@@ -58,20 +59,44 @@ def get_fields(x,parent=''):
     return fields
 
 def to_fields(x):
+    to_definiton_list = False
     for v in x.values():
         if isinstance(v,dict):
-            pass
-
-    if len(x) == 1:
+            to_definiton_list = True
+            break
+    if to_definiton_list:
         node = nodes.definition_list()
-        df = nodes.definition_list_item()
-        key = next(iter(x))
-        df.append(nodes.term(text=key))
-        node.append(df)
-        dfv = nodes.definition()
-        dfv.append(to_fields(x[key]))
-        node.append(dfv)
-        return node
+        previous_fieldlist = None
+        for key,v in x.items():
+            df = nodes.definition_list_item()
+            if isinstance(v,str): # embed field_list inside definition_list
+                if previous_fieldlist is None:
+                    fv = previous_fieldlist = nodes.field_list()
+                    df.append(fv)
+                    node.append(df)
+                else:
+                    fv = previous_fieldlist
+                fvf = nodes.field()
+                fv.append(fvf)
+                fvf.append(nodes.field_name(text=key))
+                fvf.append(nodes.field_body(v,nodes.Text(v)))
+            else:
+                previous_fieldlist = None
+                df.append(nodes.term(text=key))
+                dfv = nodes.definition()
+                dfv.append(to_fields(v))
+                df.append(dfv)
+                node.append(df)
+    else:
+        node = nodes.field_list()
+        for key,v in x.items():
+            df = nodes.field()
+            df.append(nodes.field_name(text=key))
+            dfv = nodes.field_body(v,nodes.Text(v))
+            df.append(dfv)
+            node.append(df)
+    return node
+
 
 class asyncapi_node(nodes.Admonition, nodes.Element):
     pass
@@ -101,58 +126,45 @@ class AsyncApiChannelDirective(BaseAdmonition,SphinxDirective):
         'class': directives.class_option,
         'name': directives.unchanged,
         'format': directives.unchanged,
+        'from_file': directives.unchanged,
     }
 
     def run(self):
+        filepath = self.options.get('from_file')
+        if filepath is not None:
+            self.set_source_info(self)
+            cur_dir = os.path.dirname(self.source)
+            filepath = os.path.join(cur_dir,filepath)
+            with open(filepath,'r') as infile:
+                content = infile.read()
+        else:
+            content = '\n'.join(self.content).strip()
         asyncapi_format = self.options.get('format', 'rst')
         # use all the text
         as_admonition = asyncapi_format == 'rst'
+        # import IPython
+        # IPython.embed()
         if as_admonition:
             (channel,) = super().run()  # type: Tuple[Node]
             res = get_fields(channel.children[0])
         elif yaml is not None:
-            channel = self.node_class('')
-            text = '\n'.join(self.content).strip()
-            res = yaml.load(text)
+            # channel = self.node_class('')
+            res = yaml.load(content)
+            # channel.append(to_fields(res))
         else:
             raise Exception('Needs optional dependencies ruamel.yaml')
-        # parse asyncapi spec
-        channel['asyncapi'] = res 
-        channel['docname'] = self.env.docname
-        self.add_name(channel)
-        self.set_source_info(channel)
-        self.state.document.note_explicit_target(channel)
-        if not as_admonition:
-            for topic,topic_spec in res.items():
-                for operation,operation_spec in topic_spec.items():
-                    if operation == 'publish':
-                        op = 'PUB'
-                    elif operation == 'subscribe':
-                        op = 'SUB'
-                    else:
-                        logger.error('Warning operation %s not supported',operation)
-                        continue
-                    message_spec = operation_spec.get('message',{})
-                    p = nodes.strong(text=topic)
-                    channel.append(p)
-                    p = nodes.paragraph()
-                    p.append(nodes.inline(text=op,classes=['guilabel']))
-                    if 'contentType' in message_spec:
-                        p.append(nodes.inline(text=' '))
-                        p.append(nodes.inline(text=message_spec['contentType'],classes=['guilabel']))
-                    channel.append(p)
-                    p = nodes.paragraph()
-                    p.append(nodes.emphasis(text=operation_spec.get('summary','')))
-                    channel.append(p)
-                    for key,spec in message_spec.get('payload',{}).get('properties',{}).items():
-                        fl = nodes.field_list()
-                        field = nodes.field()
-                        field.append(nodes.field_name(key,nodes.Text(key)))
-                        field.append(nodes.field_body('spec',self.make_property_spec(spec)))
-                        fl.append(field)
-                        channel.append(fl)
-                    channel.append(nodes.paragraph())
-        return [channel]
+        channels = []
+        for topic,topic_spec in res.items():
+            for op,op_spec in topic_spec.items():
+                channel = self.node_class('')
+                channel['asyncapi'] = dat = {topic:{op:op_spec}} 
+                channel['docname'] = self.env.docname
+                # self.add_name(channel)
+                self.set_source_info(channel)
+                self.state.document.note_explicit_target(channel)
+                channel.append(to_fields(dat))
+                channels.append(channel)
+        return channels
 
     def make_property_spec(self,property_spec):
         fl = nodes.field_list()
@@ -182,6 +194,7 @@ class AsynApiDomain(Domain):
                     document: nodes.document) -> None:
         channels = self.channels.setdefault(docname, [])
         for channel in document.traverse(asyncapi_node):
+            # print('3333333333333333',channel['asyncapi'],channel.astext())
             env.app.emit('asyncapi-channels-defined', channel)
             channels.append(channel)
 
@@ -207,7 +220,6 @@ class AsyncApiChannelProcessor:
         self.domain = app.env.get_domain('asyncapi')
 
         self.process(doctree, docname)
-
 
     def create_table(self):
         table = nodes.table()
@@ -241,8 +253,11 @@ class AsyncApiChannelProcessor:
             for topic,topic_spec in channel['asyncapi'].items():
                 for operation,op_spec in topic_spec.items():
                     if operation == wanted_operation:
-                        source = channel.source.split(' of ')[1]
-                        ref = self.create_channel_reference(source,channel, docname)
+                        if 'of' in channel.source:
+                            link_text = channel.source.split(' of ')[1]
+                        else:
+                            link_text = channel['ids'][0][2:]
+                        ref = self.create_channel_reference(link_text,channel, docname)
                         per_topic[topic].append((op_spec['summary'],ref))
         for topic,topic_spec in per_topic.items():
             summary = topic_spec[0][0]
